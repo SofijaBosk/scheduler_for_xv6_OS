@@ -105,3 +105,8 @@ uptime:
  li a7, SYS_uptime
  ecall
  ret
+.global changeSchedulingAlgorithm
+changeSchedulingAlgorithm:
+ li a7, SYS_changeSchedulingAlgorithm
+ ecall
+ ret

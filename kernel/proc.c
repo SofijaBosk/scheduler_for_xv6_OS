@@ -428,23 +428,21 @@ wait(uint64 addr)
 }
 
 
-//struct proc*
-//get(void)
-//{
-//    struct proc* p;
-//    for(p = proc; p < &proc[NPROC]; p++) {
-//        if (p->state == RUNNABLE) {
-//            p->state=RUNNING;
-//            return p;
-//        }
-//        release(&p->lock);
-//    }
-//
-//    return 0;
-//}
+//Geter of the next ready process by the set algorithm
 struct proc*
 get(void)
 {
+    //TO DO: Test da li syscall za promenu algoritma stvarno menja algoritam
+
+//    struct cpu *c = mycpu();
+//    switch (c->scheduling_algorithm) {
+//        SJF:
+//            printf("%s \n",c->scheduling_algorithm);
+//            break;
+//        CFS:
+//            printf("%s \n",c->scheduling_algorithm);
+//            break;
+//    }
     struct proc* p;
     for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
@@ -457,6 +455,7 @@ get(void)
     return 0;
 }
 
+//Puts necessary parameters for scheduling the process
 void
 put(struct proc* p)
 {
@@ -475,7 +474,8 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  
+//  c->scheduling_algorithm="SJF";
+  //printf("%s \n",c->scheduling_algorithm);
   c->proc = 0;
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
@@ -497,6 +497,20 @@ scheduler(void)
     }
 
   }
+}
+//Fja za promenu algoritma rasporedjivanja na odredjenom procesoru
+int changeSchedulingAlgorithm(char *type)
+{
+    printf("druga %s \n",type);
+    struct cpu *c = mycpu();
+//    if(strcmp(type,"SJF") || strcmp(type,"SJF"))
+//    {
+        c->scheduling_algorithm= type;//(type==1)? "SJF" : "CFS";
+        printf("treca-USPESNO: %s \n",c->scheduling_algorithm);
+        return 0;
+//    }
+//    else return -1;
+
 }
 
 // Switch to scheduler.  Must hold only p->lock

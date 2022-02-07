@@ -41,5 +41,7 @@ main()
     plicinithart();   // ask PLIC for device interrupts
   }
 
-  scheduler();        
+ // changeSchedulingAlgorithm(2);
+  scheduler();
+
 }

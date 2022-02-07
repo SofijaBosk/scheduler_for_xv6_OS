@@ -7,6 +7,7 @@
 #include "spinlock.h"
 #include "proc.h"
 
+
 uint64
 sys_exit(void)
 {
@@ -94,4 +95,14 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+uint64
+sys_changeSchedulingAlgorithm(void)
+{
+    char sp[3];
+    if(argstr(0, sp,4) < 0) //uzimamo prvi parametar koji nam govori koji algoritam da koristimo
+        return -1;
+    printf(" prva %s \n",sp);
+    return changeSchedulingAlgorithm(sp);
 }

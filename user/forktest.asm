@@ -48,7 +48,7 @@ forktest(void)
 
   print("fork test\n");
   40:	00000517          	auipc	a0,0x0
-  44:	65850513          	addi	a0,a0,1624 # 698 <uptime+0x8>
+  44:	66050513          	addi	a0,a0,1632 # 6a0 <changeSchedulingAlgorithm+0x8>
   48:	00000097          	auipc	ra,0x0
   4c:	fb8080e7          	jalr	-72(ra) # 0 <print>
 
@@ -93,7 +93,7 @@ forktest(void)
   aa:	04f71963          	bne	a4,a5,fc <forktest+0xc4>
     print("fork claimed to work N times!\n");
   ae:	00000517          	auipc	a0,0x0
-  b2:	5fa50513          	addi	a0,a0,1530 # 6a8 <uptime+0x18>
+  b2:	60250513          	addi	a0,a0,1538 # 6b0 <changeSchedulingAlgorithm+0x18>
   b6:	00000097          	auipc	ra,0x0
   ba:	f4a080e7          	jalr	-182(ra) # 0 <print>
     exit(1);
@@ -111,7 +111,7 @@ forktest(void)
   d4:	0007df63          	bgez	a5,f2 <forktest+0xba>
       print("wait stopped early\n");
   d8:	00000517          	auipc	a0,0x0
-  dc:	5f050513          	addi	a0,a0,1520 # 6c8 <uptime+0x38>
+  dc:	5f850513          	addi	a0,a0,1528 # 6d0 <changeSchedulingAlgorithm+0x38>
   e0:	00000097          	auipc	ra,0x0
   e4:	f20080e7          	jalr	-224(ra) # 0 <print>
       exit(1);
@@ -138,7 +138,7 @@ forktest(void)
  116:	00f70f63          	beq	a4,a5,134 <forktest+0xfc>
     print("wait got too many\n");
  11a:	00000517          	auipc	a0,0x0
- 11e:	5c650513          	addi	a0,a0,1478 # 6e0 <uptime+0x50>
+ 11e:	5ce50513          	addi	a0,a0,1486 # 6e8 <changeSchedulingAlgorithm+0x50>
  122:	00000097          	auipc	ra,0x0
  126:	ede080e7          	jalr	-290(ra) # 0 <print>
     exit(1);
@@ -149,7 +149,7 @@ forktest(void)
 
   print("fork test OK\n");
  134:	00000517          	auipc	a0,0x0
- 138:	5c450513          	addi	a0,a0,1476 # 6f8 <uptime+0x68>
+ 138:	5cc50513          	addi	a0,a0,1484 # 700 <changeSchedulingAlgorithm+0x68>
  13c:	00000097          	auipc	ra,0x0
  140:	ec4080e7          	jalr	-316(ra) # 0 <print>
 }
@@ -923,3 +923,12 @@ uptime:
  692:	00000073          	ecall
  ret
  696:	8082                	ret
+
+0000000000000698 <changeSchedulingAlgorithm>:
+.global changeSchedulingAlgorithm
+changeSchedulingAlgorithm:
+ li a7, SYS_changeSchedulingAlgorithm
+ 698:	48d9                	li	a7,22
+ ecall
+ 69a:	00000073          	ecall
+ 69e:	8082                	ret
