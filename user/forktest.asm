@@ -931,4 +931,5 @@ changeSchedulingAlgorithm:
  698:	48d9                	li	a7,22
  ecall
  69a:	00000073          	ecall
+ ret
  69e:	8082                	ret

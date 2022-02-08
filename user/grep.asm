@@ -1195,6 +1195,7 @@ changeSchedulingAlgorithm:
      948:	48d9                	li	a7,22
  ecall
      94a:	00000073          	ecall
+ ret
      94e:	8082                	ret
 
 0000000000000950 <putc>:

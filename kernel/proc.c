@@ -12,8 +12,11 @@ struct proc proc[NPROC];
 
 struct proc *initproc;
 
+
+
 int nextpid = 1;
 struct spinlock pid_lock;
+struct  spinlock process_lock;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -427,39 +430,127 @@ wait(uint64 addr)
   }
 }
 
+//TO DO: Test da li syscall za promenu algoritma stvarno menja algoritam
 
-//Geter of the next ready process by the set algorithm
 struct proc*
-get(void)
+getCFS(void)
 {
-    //TO DO: Test da li syscall za promenu algoritma stvarno menja algoritam
-
-//    struct cpu *c = mycpu();
-//    switch (c->scheduling_algorithm) {
-//        SJF:
-//            printf("%s \n",c->scheduling_algorithm);
-//            break;
-//        CFS:
-//            printf("%s \n",c->scheduling_algorithm);
-//            break;
-//    }
-    struct proc* p;
-    for(p = proc; p < &proc[NPROC]; p++) {
+    struct proc *p;
+    struct proc *shortestExecutionTimeP; //var for storing the shortest process next in line for using the processor za CFS
+    for(p = proc; p < &proc[NPROC]; p++)
+    {
         acquire(&p->lock);
-        if (p->state == RUNNABLE) {
-            p->state = RUNNING;
-            return p;
+        if(p->state == RUNNABLE)
+        {
+            shortestExecutionTimeP=p;
+            if (shortestExecutionTimeP == 0) shortestExecutionTimeP = p;//prvi spreman proces
+            if (shortestExecutionTimeP->executionTime > p->executionTime) {
+                shortestExecutionTimeP = p;
+            }
+        }
+
+        release(&p->lock);
+    }
+
+    if(shortestExecutionTimeP)
+    {
+        acquire(&shortestExecutionTimeP->lock);
+        shortestExecutionTimeP->state=RUNNING;
+        shortestExecutionTimeP->executionTime = (ticks - shortestExecutionTimeP->startTime) / NPROC;
+    }
+    return shortestExecutionTimeP;
+}
+
+struct proc*
+getSJF(void)
+{
+    Time min_time=~0; //For calculating min time
+    struct proc *chosen; //For SJF for the process with the shortest execution time
+    struct proc *p;
+
+    for(p = proc; p < &proc[NPROC]; p++)
+    {
+        acquire(&p->lock);
+        //proveravamo da li je proces alociran i spreman
+        if(p->state == RUNNABLE && p->prediction<=min_time)
+        {
+            min_time=p->prediction;
+            chosen=p;
         }
         release(&p->lock);
     }
-    return 0;
+    if(chosen)
+    {
+        acquire(&chosen->lock);
+        chosen->state=RUNNING;
+        chosen->begin_process_time=ticks;
+    }
+    return chosen;
 }
+
+////Geter of the next ready process by the set algorithm
+//struct proc*
+//get(void)
+//{
+////
+////    struct proc *p;
+////    struct cpu *c = mycpu();
+////
+////    if(c->scheduler->scheduling_algorithm==SJF)
+////    {
+////        p=getSJF();
+////    }
+////    else
+////    {
+////        p=getCFS();
+////    }
+////    return p;
+//
+///** OSNOVNA IMPLEMENTACIJA
+//    struct proc* p;
+//    for(p = proc; p < &proc[NPROC]; p++) {
+//        acquire(&p->lock);
+//        if (p->state == RUNNABLE) {
+//            p->state = RUNNING;
+//            return p;
+//        }
+//        release(&p->lock);
+//    }
+//    return 0;
+//**/
+//
+//    return 0;
+//}
 
 //Puts necessary parameters for scheduling the process
 void
 put(struct proc* p)
 {
+    struct cpu* c=mycpu();
+
+    if(p){
+        //CFS
+        p->startTime = ticks;
+
+        //SJF
+        if(p->state == RUNNING) p->last_CPU_burst=ticks-p->begin_process_time;
+        //printf("Ticks: %d \n",ticks);
+
+        if(c->scheduler)
+        {
+            //if(p->prediction==0) p->prediction=5;
+            p->prediction=(p->prediction+p->last_CPU_burst) / c->scheduler->exsponential_variant;
+            //printf("Proc pred: %d \n",p->prediction);
+        }
+
+        //Start process
+        p->state=RUNNABLE;
+
+    }
+
+  /** OSNOVNA IMPLEMENTACIJA
     p->state = RUNNABLE;
+    **/
 }
 
 // Per-CPU process scheduler.
@@ -474,13 +565,28 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
+  struct sch sch;
+    sch.scheduling_algorithm=CFS;
+    sch.exsponential_variant=1;
 //  c->scheduling_algorithm="SJF";
   //printf("%s \n",c->scheduling_algorithm);
   c->proc = 0;
   for(;;){
+      c->scheduler=&sch;
+      //printf("CPU ex var: %d \n",c->scheduler->exsponential_variant);
+
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
-    p=get();
+
+      if(c->scheduler->scheduling_algorithm==SJF)
+      {
+          p=getSJF();
+      }
+      else
+      {
+          p=getCFS();
+      }
+    //p=get();
     if(p)
     {
         // Switch to chosen process.  It is the process's job
@@ -488,25 +594,33 @@ scheduler(void)
         // before jumping back to us.
 
         c->proc = p;
+
         swtch(&c->context, &p->context);
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
-        if(&p->lock.locked) release(&p->lock);
-    }
 
+
+        //if(&p->lock.locked)
+        release(&p->lock);
+
+    }
+    //if(process_lock.locked)release(&process_lock);
   }
 }
 //Fja za promenu algoritma rasporedjivanja na odredjenom procesoru
-int changeSchedulingAlgorithm(char *type)
+int changeSchedulingAlgorithm(char *type,int exsponential_variant,int bool)
 {
-    printf("druga %s \n",type);
     struct cpu *c = mycpu();
-//    if(strcmp(type,"SJF") || strcmp(type,"SJF"))
-//    {
-        c->scheduling_algorithm= type;//(type==1)? "SJF" : "CFS";
-        printf("treca-USPESNO: %s \n",c->scheduling_algorithm);
+        if (type[0]=='S' && type[1]=='J' && type[2]=='F')c->scheduler->scheduling_algorithm= SJF;
+        if (type[0]=='C' && type[1]=='F' && type[2]=='S')c->scheduler->scheduling_algorithm= CFS;
+
+        c->scheduler->exsponential_variant=exsponential_variant;
+        c->scheduler->preemptive=bool;
+        printf("treca1-USPESNO: %d \n",c->scheduler->scheduling_algorithm);
+        printf("treca2-USPESNO: %d \n",c->scheduler->exsponential_variant);
+        printf("treca3-USPESNO: %d \n",c->scheduler->preemptive);
         return 0;
 //    }
 //    else return -1;

@@ -914,6 +914,7 @@ changeSchedulingAlgorithm:
  6ba:	48d9                	li	a7,22
  ecall
  6bc:	00000073          	ecall
+ ret
  6c0:	8082                	ret
 
 00000000000006c2 <putc>:

@@ -650,7 +650,7 @@ copyinstr2(char *s)
      618:	a00d                	j	63a <copyinstr2+0x1e6>
       big[i] = 'x';
      61a:	0000f717          	auipc	a4,0xf
-     61e:	4fe70713          	addi	a4,a4,1278 # fb18 <big.1272>
+     61e:	4fe70713          	addi	a4,a4,1278 # fb18 <big.1274>
      622:	fe842783          	lw	a5,-24(s0)
      626:	97ba                	add	a5,a5,a4
      628:	07800713          	li	a4,120
@@ -665,7 +665,7 @@ copyinstr2(char *s)
      644:	fcf74be3          	blt	a4,a5,61a <copyinstr2+0x1c6>
     big[PGSIZE] = '\0';
      648:	0000f717          	auipc	a4,0xf
-     64c:	4d070713          	addi	a4,a4,1232 # fb18 <big.1272>
+     64c:	4d070713          	addi	a4,a4,1232 # fb18 <big.1274>
      650:	6785                	lui	a5,0x1
      652:	97ba                	add	a5,a5,a4
      654:	00078023          	sb	zero,0(a5) # 1000 <truncate3+0x1aa>
@@ -9650,7 +9650,7 @@ bigargtest(char *s)
     5e9e:	a01d                	j	5ec4 <bigargtest+0x5c>
       args[i] = "bigargs test: failed\n                                                                                                                                                                                                       ";
     5ea0:	0000b717          	auipc	a4,0xb
-    5ea4:	c8070713          	addi	a4,a4,-896 # 10b20 <args.1861>
+    5ea4:	c8070713          	addi	a4,a4,-896 # 10b20 <args.1863>
     5ea8:	fec42783          	lw	a5,-20(s0)
     5eac:	078e                	slli	a5,a5,0x3
     5eae:	97ba                	add	a5,a5,a4
@@ -9667,11 +9667,11 @@ bigargtest(char *s)
     5ece:	fce7d9e3          	bge	a5,a4,5ea0 <bigargtest+0x38>
     args[MAXARG-1] = 0;
     5ed2:	0000b797          	auipc	a5,0xb
-    5ed6:	c4e78793          	addi	a5,a5,-946 # 10b20 <args.1861>
+    5ed6:	c4e78793          	addi	a5,a5,-946 # 10b20 <args.1863>
     5eda:	0e07bc23          	sd	zero,248(a5)
     exec("echo", args);
     5ede:	0000b597          	auipc	a1,0xb
-    5ee2:	c4258593          	addi	a1,a1,-958 # 10b20 <args.1861>
+    5ee2:	c4258593          	addi	a1,a1,-958 # 10b20 <args.1863>
     5ee6:	00002517          	auipc	a0,0x2
     5eea:	24a50513          	addi	a0,a0,586 # 8130 <malloc+0x6c0>
     5eee:	00001097          	auipc	ra,0x1
@@ -12152,6 +12152,7 @@ changeSchedulingAlgorithm:
     73e8:	48d9                	li	a7,22
  ecall
     73ea:	00000073          	ecall
+ ret
     73ee:	8082                	ret
 
 00000000000073f0 <putc>:

@@ -73,7 +73,7 @@ fmtname(char *path)
       90:	863e                	mv	a2,a5
       92:	fd843583          	ld	a1,-40(s0)
       96:	00001517          	auipc	a0,0x1
-      9a:	08250513          	addi	a0,a0,130 # 1118 <buf.1109>
+      9a:	08250513          	addi	a0,a0,130 # 1118 <buf.1111>
       9e:	00000097          	auipc	ra,0x0
       a2:	5fc080e7          	jalr	1532(ra) # 69a <memmove>
   memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
@@ -85,7 +85,7 @@ fmtname(char *path)
       b6:	02079713          	slli	a4,a5,0x20
       ba:	9301                	srli	a4,a4,0x20
       bc:	00001797          	auipc	a5,0x1
-      c0:	05c78793          	addi	a5,a5,92 # 1118 <buf.1109>
+      c0:	05c78793          	addi	a5,a5,92 # 1118 <buf.1111>
       c4:	00f704b3          	add	s1,a4,a5
       c8:	fd843503          	ld	a0,-40(s0)
       cc:	00000097          	auipc	ra,0x0
@@ -102,7 +102,7 @@ fmtname(char *path)
       ec:	38e080e7          	jalr	910(ra) # 476 <memset>
   return buf;
       f0:	00001797          	auipc	a5,0x1
-      f4:	02878793          	addi	a5,a5,40 # 1118 <buf.1109>
+      f4:	02878793          	addi	a5,a5,40 # 1118 <buf.1111>
 }
       f8:	853e                	mv	a0,a5
       fa:	70e2                	ld	ra,56(sp)
@@ -1133,6 +1133,7 @@ changeSchedulingAlgorithm:
      8c0:	48d9                	li	a7,22
  ecall
      8c2:	00000073          	ecall
+ ret
      8c6:	8082                	ret
 
 00000000000008c8 <putc>:

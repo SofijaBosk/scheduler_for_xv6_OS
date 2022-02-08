@@ -97,7 +97,7 @@ void            procinit(void);
 struct proc*    get(void);
 void            put(struct proc*);
 void            scheduler(void) __attribute__((noreturn));
-int            changeSchedulingAlgorithm(char* type);
+int            changeSchedulingAlgorithm(char* type,int exsponential_variant,int bool);
 void            sched(void);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);

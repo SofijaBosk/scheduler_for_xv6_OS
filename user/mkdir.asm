@@ -838,6 +838,7 @@ changeSchedulingAlgorithm:
  5da:	48d9                	li	a7,22
  ecall
  5dc:	00000073          	ecall
+ ret
  5e0:	8082                	ret
 
 00000000000005e2 <putc>:

@@ -308,7 +308,7 @@ go(int which_child)
      2ee:	fec42783          	lw	a5,-20(s0)
      2f2:	3e700613          	li	a2,999
      2f6:	00002597          	auipc	a1,0x2
-     2fa:	bfa58593          	addi	a1,a1,-1030 # 1ef0 <buf.1239>
+     2fa:	bfa58593          	addi	a1,a1,-1030 # 1ef0 <buf.1241>
      2fe:	853e                	mv	a0,a5
      300:	00001097          	auipc	ra,0x1
      304:	082080e7          	jalr	130(ra) # 1382 <write>
@@ -322,7 +322,7 @@ go(int which_child)
      318:	fec42783          	lw	a5,-20(s0)
      31c:	3e700613          	li	a2,999
      320:	00002597          	auipc	a1,0x2
-     324:	bd058593          	addi	a1,a1,-1072 # 1ef0 <buf.1239>
+     324:	bd058593          	addi	a1,a1,-1072 # 1ef0 <buf.1241>
      328:	853e                	mv	a0,a5
      32a:	00001097          	auipc	ra,0x1
      32e:	050080e7          	jalr	80(ra) # 137a <read>
@@ -2209,6 +2209,7 @@ changeSchedulingAlgorithm:
     1402:	48d9                	li	a7,22
  ecall
     1404:	00000073          	ecall
+ ret
     1408:	8082                	ret
 
 000000000000140a <putc>:

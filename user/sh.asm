@@ -373,19 +373,19 @@ main(void)
      330:	a8d9                	j	406 <main+0x120>
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
      332:	00002797          	auipc	a5,0x2
-     336:	a9678793          	addi	a5,a5,-1386 # 1dc8 <buf.1135>
+     336:	a9678793          	addi	a5,a5,-1386 # 1dc8 <buf.1137>
      33a:	0007c783          	lbu	a5,0(a5)
      33e:	873e                	mv	a4,a5
      340:	06300793          	li	a5,99
      344:	08f71863          	bne	a4,a5,3d4 <main+0xee>
      348:	00002797          	auipc	a5,0x2
-     34c:	a8078793          	addi	a5,a5,-1408 # 1dc8 <buf.1135>
+     34c:	a8078793          	addi	a5,a5,-1408 # 1dc8 <buf.1137>
      350:	0017c783          	lbu	a5,1(a5)
      354:	873e                	mv	a4,a5
      356:	06400793          	li	a5,100
      35a:	06f71d63          	bne	a4,a5,3d4 <main+0xee>
      35e:	00002797          	auipc	a5,0x2
-     362:	a6a78793          	addi	a5,a5,-1430 # 1dc8 <buf.1135>
+     362:	a6a78793          	addi	a5,a5,-1430 # 1dc8 <buf.1137>
      366:	0027c783          	lbu	a5,2(a5)
      36a:	873e                	mv	a4,a5
      36c:	02000793          	li	a5,32
@@ -393,7 +393,7 @@ main(void)
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
      374:	00002517          	auipc	a0,0x2
-     378:	a5450513          	addi	a0,a0,-1452 # 1dc8 <buf.1135>
+     378:	a5450513          	addi	a0,a0,-1452 # 1dc8 <buf.1137>
      37c:	00001097          	auipc	ra,0x1
      380:	c90080e7          	jalr	-880(ra) # 100c <strlen>
      384:	87aa                	mv	a5,a0
@@ -401,14 +401,14 @@ main(void)
      388:	37fd                	addiw	a5,a5,-1
      38a:	2781                	sext.w	a5,a5
      38c:	00002717          	auipc	a4,0x2
-     390:	a3c70713          	addi	a4,a4,-1476 # 1dc8 <buf.1135>
+     390:	a3c70713          	addi	a4,a4,-1476 # 1dc8 <buf.1137>
      394:	1782                	slli	a5,a5,0x20
      396:	9381                	srli	a5,a5,0x20
      398:	97ba                	add	a5,a5,a4
      39a:	00078023          	sb	zero,0(a5)
       if(chdir(buf+3) < 0)
      39e:	00002797          	auipc	a5,0x2
-     3a2:	a2d78793          	addi	a5,a5,-1491 # 1dcb <buf.1135+0x3>
+     3a2:	a2d78793          	addi	a5,a5,-1491 # 1dcb <buf.1137+0x3>
      3a6:	853e                	mv	a0,a5
      3a8:	00001097          	auipc	ra,0x1
      3ac:	0b4080e7          	jalr	180(ra) # 145c <chdir>
@@ -416,7 +416,7 @@ main(void)
      3b2:	0407da63          	bgez	a5,406 <main+0x120>
         fprintf(2, "cannot cd %s\n", buf+3);
      3b6:	00002797          	auipc	a5,0x2
-     3ba:	a1578793          	addi	a5,a5,-1515 # 1dcb <buf.1135+0x3>
+     3ba:	a1578793          	addi	a5,a5,-1515 # 1dcb <buf.1137+0x3>
      3be:	863e                	mv	a2,a5
      3c0:	00002597          	auipc	a1,0x2
      3c4:	8f058593          	addi	a1,a1,-1808 # 1cb0 <malloc+0x19c>
@@ -433,7 +433,7 @@ main(void)
      3de:	ef99                	bnez	a5,3fc <main+0x116>
       runcmd(parsecmd(buf));
      3e0:	00002517          	auipc	a0,0x2
-     3e4:	9e850513          	addi	a0,a0,-1560 # 1dc8 <buf.1135>
+     3e4:	9e850513          	addi	a0,a0,-1560 # 1dc8 <buf.1137>
      3e8:	00000097          	auipc	ra,0x0
      3ec:	4e2080e7          	jalr	1250(ra) # 8ca <parsecmd>
      3f0:	87aa                	mv	a5,a0
@@ -447,7 +447,7 @@ main(void)
   while(getcmd(buf, sizeof(buf)) >= 0){
      406:	06400593          	li	a1,100
      40a:	00002517          	auipc	a0,0x2
-     40e:	9be50513          	addi	a0,a0,-1602 # 1dc8 <buf.1135>
+     40e:	9be50513          	addi	a0,a0,-1602 # 1dc8 <buf.1137>
      412:	00000097          	auipc	ra,0x0
      416:	e70080e7          	jalr	-400(ra) # 282 <getcmd>
      41a:	87aa                	mv	a5,a0
@@ -2463,6 +2463,7 @@ changeSchedulingAlgorithm:
     148c:	48d9                	li	a7,22
  ecall
     148e:	00000073          	ecall
+ ret
     1492:	8082                	ret
 
 0000000000001494 <putc>:

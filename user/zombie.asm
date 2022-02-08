@@ -784,6 +784,7 @@ changeSchedulingAlgorithm:
  55a:	48d9                	li	a7,22
  ecall
  55c:	00000073          	ecall
+ ret
  560:	8082                	ret
 
 0000000000000562 <putc>:

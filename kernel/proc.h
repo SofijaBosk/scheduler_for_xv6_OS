@@ -18,14 +18,37 @@ struct context {
   uint64 s11;
 };
 
+//Modifikacija:
+typedef uint Time; //ovim cemo mi da racunamo vreme uz pomoc ticks
+//.................
+enum scheduling_type{
+    SJF=1,CFS=2
+};
+
+struct sch
+{
+    enum scheduling_type scheduling_algorithm;
+
+    //SJF:
+    int exsponential_variant; //given at the beginning of the process life
+    int preemptive; //if the scheduler allows interuptions 1-yes 0-no
+
+    //CSF:
+    //TO DO
+};
+
+
+
 // Per-CPU state.
 struct cpu {
   struct proc *proc;          // The process running on this cpu, or null.
   struct context context;     // swtch() here to enter scheduler().
   int noff;                   // Depth of push_off() nesting.
   int intena;                 // Were interrupts enabled before push_off()?
-  char* scheduling_algorithm;
+  struct sch* scheduler;
 };
+
+
 
 extern struct cpu cpus[NCPU];
 
@@ -106,4 +129,18 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  //SJF parameters
+  Time prediction; //for next CPU burst
+  Time last_CPU_burst; // for calculating the next prediction
+  Time begin_process_time;
+
+  //CFS
+  uint64 startTime; // Denotes when the process first started
+  uint64 executionTime; //cpu time
+
+  //TO DO: (Za oba procesa)
+  Time kvant;
+
+
 };

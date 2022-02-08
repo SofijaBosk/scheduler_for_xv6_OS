@@ -986,6 +986,7 @@ changeSchedulingAlgorithm:
  752:	48d9                	li	a7,22
  ecall
  754:	00000073          	ecall
+ ret
  758:	8082                	ret
 
 000000000000075a <putc>:
