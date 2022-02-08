@@ -12,7 +12,8 @@ struct proc proc[NPROC];
 
 struct proc *initproc;
 
-
+Time tajmerMAX;
+Time tajmer;
 
 int nextpid = 1;
 struct spinlock pid_lock;
@@ -377,6 +378,7 @@ exit(int status)
   release(&wait_lock);
 
   // Jump into the scheduler, never to return.
+  //if(process_lock.locked)release(&process_lock);
   sched();
   panic("zombie exit");
 }
@@ -481,6 +483,7 @@ getSJF(void)
     }
     if(chosen)
     {
+       // acquire(&process_lock);
         acquire(&chosen->lock);
         chosen->state=RUNNING;
         chosen->begin_process_time=ticks;
@@ -545,7 +548,6 @@ put(struct proc* p)
 
         //Start process
         p->state=RUNNABLE;
-
     }
 
   /** OSNOVNA IMPLEMENTACIJA
@@ -560,20 +562,34 @@ put(struct proc* p)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
+
+
+
+
 void
 scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
   struct sch sch;
-    sch.scheduling_algorithm=CFS;
-    sch.exsponential_variant=1;
-//  c->scheduling_algorithm="SJF";
-  //printf("%s \n",c->scheduling_algorithm);
+
   c->proc = 0;
   for(;;){
-      c->scheduler=&sch;
-      //printf("CPU ex var: %d \n",c->scheduler->exsponential_variant);
+      if(!c->scheduler)
+      {
+          sch.scheduling_algorithm=CFS;
+          sch.exsponential_variant=1;
+          sch.preemptive=1;
+          sch.kvant=0;
+          tajmerMAX=sch.kvant;
+          tajmer=tajmerMAX;
+          c->scheduler=&sch;
+      }
+      else
+      {
+          tajmerMAX=c->scheduler->kvant;
+
+      }
 
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
@@ -594,17 +610,13 @@ scheduler(void)
         // before jumping back to us.
 
         c->proc = p;
-
         swtch(&c->context, &p->context);
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
 
-
-        //if(&p->lock.locked)
-        release(&p->lock);
-
+        if(&p->lock.locked) release(&p->lock);
     }
     //if(process_lock.locked)release(&process_lock);
   }
@@ -613,9 +625,17 @@ scheduler(void)
 int changeSchedulingAlgorithm(char *type,int exsponential_variant,int bool)
 {
     struct cpu *c = mycpu();
-        if (type[0]=='S' && type[1]=='J' && type[2]=='F')c->scheduler->scheduling_algorithm= SJF;
-        if (type[0]=='C' && type[1]=='F' && type[2]=='S')c->scheduler->scheduling_algorithm= CFS;
+        if (type[0]=='S' && type[1]=='J' && type[2]=='F'){
+            c->scheduler->scheduling_algorithm= SJF;
+            c->scheduler->kvant=0;
+        }
 
+        if (type[0]=='C' && type[1]=='F' && type[2]=='S')
+        {
+            c->scheduler->scheduling_algorithm= CFS;
+            c->scheduler->kvant=50;
+        }
+        tajmer=c->scheduler->kvant;
         c->scheduler->exsponential_variant=exsponential_variant;
         c->scheduler->preemptive=bool;
         printf("treca1-USPESNO: %d \n",c->scheduler->scheduling_algorithm);
@@ -637,6 +657,7 @@ int changeSchedulingAlgorithm(char *type,int exsponential_variant,int bool)
 void
 sched(void)
 {
+
   int intena;
   struct proc *p = myproc();
 
@@ -707,6 +728,7 @@ sleep(void *chan, struct spinlock *lk)
   p->chan = chan;
   p->state = SLEEPING;
 
+  //if(process_lock.locked)release(&process_lock);
   sched();
 
   // Tidy up.

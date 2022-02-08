@@ -25,16 +25,14 @@ enum scheduling_type{
     SJF=1,CFS=2
 };
 
+
+
 struct sch
 {
     enum scheduling_type scheduling_algorithm;
-
-    //SJF:
     int exsponential_variant; //given at the beginning of the process life
     int preemptive; //if the scheduler allows interuptions 1-yes 0-no
-
-    //CSF:
-    //TO DO
+    Time kvant;
 };
 
 
@@ -139,8 +137,7 @@ struct proc {
   uint64 startTime; // Denotes when the process first started
   uint64 executionTime; //cpu time
 
-  //TO DO: (Za oba procesa)
   Time kvant;
-
+  //int prekidi;
 
 };
