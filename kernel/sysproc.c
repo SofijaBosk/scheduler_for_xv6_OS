@@ -103,14 +103,12 @@ sys_changeSchedulingAlgorithm(void)
     char sp[3];
     int ex;
     int bool;
-    if(argstr(0, sp,4) < 0) //uzimamo prvi parametar koji nam govori koji algoritam da koristimo
+    if(argstr(0, sp,4) < 0)
         return -1;
-    if(argint(1, &ex) < 0) //uzimamo drugi parametar koji nam govori koji algoritam da koristimo
+    if(argint(1, &ex) < 0)
         return -1;
-    if(argint(2, &bool) < 0) //uzimamo treci parametar koji nam govori koji algoritam da koristimo
+    if(argint(2, &bool) < 0)
         return -1;
 
-//    printf(" prva1: %s  ",sp);
-//    printf(" prva2: %d \n",ex);
     return changeSchedulingAlgorithm(sp,ex,bool);
 }

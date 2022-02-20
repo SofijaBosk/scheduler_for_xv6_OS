@@ -79,14 +79,14 @@ usertrap(void)
     exit(-1);
 
   // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2 && mycpu()->scheduler->preemptive)
+  if(which_dev == 2 )
   {
-      if(tajmer==0)
+      if(tajmer==tajmerMAX)
       {
-          tajmer=tajmerMAX;
+          tajmer=0;
           yield();
       }
-      else tajmer=tajmer-1;
+      else tajmer=tajmer+1;
   }
 
   usertrapret();
@@ -159,22 +159,21 @@ kerneltrap()
   }
 
   // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING && mycpu()->scheduler->preemptive)
+  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
   {
-      if(tajmer==0)
+      if(tajmer==tajmerMAX)
       {
-          tajmer=tajmerMAX;
+          tajmer=0;
           yield();
+          // the yield() may have caused some traps to occur,
+          // so restore trap registers for use by kernelvec.S's sepc instruction.
+          w_sepc(sepc);
+          w_sstatus(sstatus);
       }
-      else tajmer=tajmer-1;
+      else{
+          tajmer=tajmer+1;
+      }
   }
-
-
-
-  // the yield() may have caused some traps to occur,
-  // so restore trap registers for use by kernelvec.S's sepc instruction.
-  w_sepc(sepc);
-  w_sstatus(sstatus);
 }
 
 void

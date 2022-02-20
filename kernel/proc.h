@@ -137,7 +137,7 @@ struct proc {
   uint64 startTime; // Denotes when the process first started
   uint64 executionTime; //cpu time
 
-  Time kvant;
-  //int prekidi;
+  Time kvant; //interrupts the process when it exceeds this time using the processor
+
 
 };

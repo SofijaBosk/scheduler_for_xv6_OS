@@ -12,8 +12,8 @@ struct proc proc[NPROC];
 
 struct proc *initproc;
 
-Time tajmerMAX;
-Time tajmer;
+Time volatile tajmerMAX=0;
+Time volatile tajmer=0;
 
 int nextpid = 1;
 struct spinlock pid_lock;
@@ -432,20 +432,19 @@ wait(uint64 addr)
   }
 }
 
-//TO DO: Test da li syscall za promenu algoritma stvarno menja algoritam
 
 struct proc*
 getCFS(void)
 {
     struct proc *p;
-    struct proc *shortestExecutionTimeP; //var for storing the shortest process next in line for using the processor za CFS
+    struct proc *shortestExecutionTimeP; //var for storing the shortest process next in line for using the processor for CFS
     for(p = proc; p < &proc[NPROC]; p++)
     {
         acquire(&p->lock);
         if(p->state == RUNNABLE)
         {
             shortestExecutionTimeP=p;
-            if (shortestExecutionTimeP == 0) shortestExecutionTimeP = p;//prvi spreman proces
+            if (shortestExecutionTimeP == 0) shortestExecutionTimeP = p;
             if (shortestExecutionTimeP->executionTime > p->executionTime) {
                 shortestExecutionTimeP = p;
             }
@@ -458,7 +457,9 @@ getCFS(void)
     {
         acquire(&shortestExecutionTimeP->lock);
         shortestExecutionTimeP->state=RUNNING;
-        shortestExecutionTimeP->executionTime = (ticks - shortestExecutionTimeP->startTime) / NPROC;
+        shortestExecutionTimeP->executionTime= shortestExecutionTimeP->kvant=(ticks - shortestExecutionTimeP->startTime) / NPROC;
+        tajmer=0;
+        tajmerMAX=p->kvant;
     }
     return shortestExecutionTimeP;
 }
@@ -473,7 +474,6 @@ getSJF(void)
     for(p = proc; p < &proc[NPROC]; p++)
     {
         acquire(&p->lock);
-        //proveravamo da li je proces alociran i spreman
         if(p->state == RUNNABLE && p->prediction<=min_time)
         {
             min_time=p->prediction;
@@ -491,40 +491,6 @@ getSJF(void)
     return chosen;
 }
 
-////Geter of the next ready process by the set algorithm
-//struct proc*
-//get(void)
-//{
-////
-////    struct proc *p;
-////    struct cpu *c = mycpu();
-////
-////    if(c->scheduler->scheduling_algorithm==SJF)
-////    {
-////        p=getSJF();
-////    }
-////    else
-////    {
-////        p=getCFS();
-////    }
-////    return p;
-//
-///** OSNOVNA IMPLEMENTACIJA
-//    struct proc* p;
-//    for(p = proc; p < &proc[NPROC]; p++) {
-//        acquire(&p->lock);
-//        if (p->state == RUNNABLE) {
-//            p->state = RUNNING;
-//            return p;
-//        }
-//        release(&p->lock);
-//    }
-//    return 0;
-//**/
-//
-//    return 0;
-//}
-
 //Puts necessary parameters for scheduling the process
 void
 put(struct proc* p)
@@ -537,22 +503,16 @@ put(struct proc* p)
 
         //SJF
         if(p->state == RUNNING) p->last_CPU_burst=ticks-p->begin_process_time;
-        //printf("Ticks: %d \n",ticks);
 
         if(c->scheduler)
         {
-            //if(p->prediction==0) p->prediction=5;
             p->prediction=(p->prediction+p->last_CPU_burst) / c->scheduler->exsponential_variant;
-            //printf("Proc pred: %d \n",p->prediction);
         }
 
         //Start process
         p->state=RUNNABLE;
     }
 
-  /** OSNOVNA IMPLEMENTACIJA
-    p->state = RUNNABLE;
-    **/
 }
 
 // Per-CPU process scheduler.
@@ -562,9 +522,6 @@ put(struct proc* p)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
-
-
-
 
 void
 scheduler(void)
@@ -578,21 +535,17 @@ scheduler(void)
       if(!c->scheduler)
       {
           sch.scheduling_algorithm=CFS;
-          sch.exsponential_variant=1;
+          sch.exsponential_variant=5;
           sch.preemptive=1;
-          sch.kvant=0;
+          sch.kvant=10;
           tajmerMAX=sch.kvant;
           tajmer=tajmerMAX;
           c->scheduler=&sch;
       }
-      else
-      {
-          tajmerMAX=c->scheduler->kvant;
-
-      }
 
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
+
 
       if(c->scheduler->scheduling_algorithm==SJF)
       {
@@ -602,7 +555,7 @@ scheduler(void)
       {
           p=getCFS();
       }
-    //p=get();
+
     if(p)
     {
         // Switch to chosen process.  It is the process's job
@@ -621,29 +574,33 @@ scheduler(void)
     //if(process_lock.locked)release(&process_lock);
   }
 }
-//Fja za promenu algoritma rasporedjivanja na odredjenom procesoru
+
+//function for changing the scheduling algorithm
 int changeSchedulingAlgorithm(char *type,int exsponential_variant,int bool)
 {
     struct cpu *c = mycpu();
+        c->scheduler->preemptive=1;
         if (type[0]=='S' && type[1]=='J' && type[2]=='F'){
             c->scheduler->scheduling_algorithm= SJF;
             c->scheduler->kvant=0;
+            c->scheduler->preemptive=bool;
+            tajmer=tajmerMAX=0;
         }
-
+        else
         if (type[0]=='C' && type[1]=='F' && type[2]=='S')
         {
             c->scheduler->scheduling_algorithm= CFS;
-            c->scheduler->kvant=50;
+            c->scheduler->kvant=10;
+            c->scheduler->preemptive=1;
+            tajmer=0;
+            tajmerMAX=10;
         }
-        tajmer=c->scheduler->kvant;
+        else
+            return -1;
         c->scheduler->exsponential_variant=exsponential_variant;
-        c->scheduler->preemptive=bool;
-        printf("treca1-USPESNO: %d \n",c->scheduler->scheduling_algorithm);
-        printf("treca2-USPESNO: %d \n",c->scheduler->exsponential_variant);
-        printf("treca3-USPESNO: %d \n",c->scheduler->preemptive);
+
+        printf("SCHADULER: %s \n", type);
         return 0;
-//    }
-//    else return -1;
 
 }
 
@@ -721,8 +678,9 @@ sleep(void *chan, struct spinlock *lk)
   // (wakeup locks p->lock),
   // so it's okay to release lk.
 
-  acquire(&p->lock);  //DOC: sleeplock1
-  release(lk);
+
+   acquire(&p->lock);  //DOC: sleeplock1
+   release(lk);
 
   // Go to sleep.
   p->chan = chan;

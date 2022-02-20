@@ -51,7 +51,7 @@ int
 main(int argc, char *argv[])
 {
     int proc_num = 8;
-    int length = 100;
+    int length = 500;
 
     for (int i = 1; i < argc; i++) {
         switch (i) {
